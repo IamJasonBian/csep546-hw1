@@ -1,10 +1,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import PolynomialFeatures
+
 if __name__ == "__main__":
     from polyreg import PolynomialRegression  # type: ignore
 else:
-    from polyreg import PolynomialRegression
+    from .polyreg import PolynomialRegression
 
 if __name__ == "__main__":
     """
@@ -12,7 +16,7 @@ if __name__ == "__main__":
     """
 
     # load the data
-    filePath = "data/polydata.dat"
+    filePath = "data/polyreg/polydata.dat"
     file = open(filePath, "r")
     allData = np.loadtxt(file, delimiter=",")
 
@@ -23,6 +27,8 @@ if __name__ == "__main__":
     d = 8
     model = PolynomialRegression(degree=d, reg_lambda=0)
     model.fit(X, y)
+
+    print(model.fit)
 
     # output predictions
     xpoints = np.linspace(np.max(X), np.min(X), 100).reshape(-1, 1)

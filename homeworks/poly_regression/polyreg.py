@@ -6,6 +6,7 @@
 from typing import Tuple
 
 import numpy as np
+import pandas as pd
 
 from utils import problem
 
@@ -18,7 +19,7 @@ class PolynomialRegression:
         """
         self.degree: int = degree
         self.reg_lambda: float = reg_lambda
-        raise NotImplementedError("Your Code Goes Here")
+        self.weights = None 
 
     @staticmethod
     @problem.tag("hw1-A")
@@ -36,7 +37,18 @@ class PolynomialRegression:
                 Note that the returned matrix will not include the zero-th power.
 
         """
-        raise NotImplementedError("Your Code Goes Here")
+        base = X
+
+        print(X)
+
+        for i in range(degree):
+            new = base * base
+            X = np.append(X, new, 1)
+            base = new
+
+        #Fix poly expansion function
+       
+        return(X)
 
     @problem.tag("hw1-A")
     def fit(self, X: np.ndarray, y: np.ndarray):
@@ -50,7 +62,30 @@ class PolynomialRegression:
         Note:
             You need to apply polynomial expansion and scaling at first.
         """
-        raise NotImplementedError("Your Code Goes Here")
+        n = len(X)
+
+        # add additional polynomial features
+        X = self.polyfeatures(X, self.degree)
+
+        # standardize all features
+        X_mean = np.mean(X, axis = 0)
+        X_var = np.var(X, axis = 0)
+        X = (X-X_mean)/np.sqrt(X_var)
+
+        # add 1s column
+        X_ = np.c_[np.ones([n, 1]), X]
+
+        n, d = X_.shape
+        d = d-1  #remove 1 for the extra column of ones we added to get the original num features
+
+        # construct reg matrix
+        reg_matrix = self.reg_lambda * np.eye(d + 1)
+        reg_matrix[0, 0] = 0
+
+        # analytical solution (X'X + regMatrix)^-1 X' y
+        self.weights = np.linalg.pinv(X_.T.dot(X_) + reg_matrix).dot(X_.T).dot(y)
+
+        print(self.weights)
 
     @problem.tag("hw1-A")
     def predict(self, X: np.ndarray) -> np.ndarray:
@@ -63,7 +98,16 @@ class PolynomialRegression:
         Returns:
             np.ndarray: Array of shape (n, 1) with predictions.
         """
-        raise NotImplementedError("Your Code Goes Here")
+
+        n = len(X)
+
+        # add 1s column
+        X_ = np.c_[np.ones([n, 1]), X]
+
+        print(X_)
+
+        # predict
+        return X_.dot(self.weights)
 
 
 @problem.tag("hw1-A")
