@@ -186,7 +186,6 @@ class TestPolyReg(TestCase):
             model = PolynomialRegression(degree=degree, reg_lambda=reg_lambda)
             model.fit(X, y)
             actual = model.predict(X_test).squeeze()
-
             np.testing.assert_array_almost_equal(actual, expected, decimal=4)
         except:  # noqa: E722
             raise

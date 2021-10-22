@@ -15,6 +15,7 @@ if __name__ == "__main__":
         Main function to test polynomial regression
     """
 
+
     # load the data
     filePath = "data/polyreg/polydata.dat"
     file = open(filePath, "r")

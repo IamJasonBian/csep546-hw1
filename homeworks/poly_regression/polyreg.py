@@ -7,6 +7,8 @@ from typing import Tuple
 
 import numpy as np
 import pandas as pd
+import pdb
+from sklearn.preprocessing import PolynomialFeatures
 
 from utils import problem
 
@@ -19,7 +21,9 @@ class PolynomialRegression:
         """
         self.degree: int = degree
         self.reg_lambda: float = reg_lambda
-        self.weights = None 
+        self.weight = None 
+        self.X_mean = None
+        self.X_std = None
 
     @staticmethod
     @problem.tag("hw1-A")
@@ -37,18 +41,10 @@ class PolynomialRegression:
                 Note that the returned matrix will not include the zero-th power.
 
         """
-        base = X
-
-        print(X)
-
-        for i in range(degree):
-            new = base * base
-            X = np.append(X, new, 1)
-            base = new
-
-        #Fix poly expansion function
-       
-        return(X)
+        poly = PolynomialFeatures(degree=degree)
+        X = poly.fit_transform(X.reshape(-1,1))
+      
+        return(X[:,1:])
 
     @problem.tag("hw1-A")
     def fit(self, X: np.ndarray, y: np.ndarray):
@@ -68,24 +64,21 @@ class PolynomialRegression:
         X = self.polyfeatures(X, self.degree)
 
         # standardize all features
-        X_mean = np.mean(X, axis = 0)
-        X_var = np.var(X, axis = 0)
-        X = (X-X_mean)/np.sqrt(X_var)
-
+        self.X_mean = np.mean(X, axis = 0)
+        self.X_std = np.std(X, axis = 0)
+        X = (X-self.X_mean)/self.X_std
+    
         # add 1s column
         X_ = np.c_[np.ones([n, 1]), X]
 
         n, d = X_.shape
-        d = d-1  #remove 1 for the extra column of ones we added to get the original num features
 
         # construct reg matrix
-        reg_matrix = self.reg_lambda * np.eye(d + 1)
+        reg_matrix = self.reg_lambda * np.eye(d)
         reg_matrix[0, 0] = 0
 
         # analytical solution (X'X + regMatrix)^-1 X' y
-        self.weights = np.linalg.pinv(X_.T.dot(X_) + reg_matrix).dot(X_.T).dot(y)
-
-        print(self.weights)
+        self.weight = np.linalg.pinv(X_.T.dot(X_) + reg_matrix).dot(X_.T).dot(y)
 
     @problem.tag("hw1-A")
     def predict(self, X: np.ndarray) -> np.ndarray:
@@ -100,15 +93,17 @@ class PolynomialRegression:
         """
 
         n = len(X)
+        X = self.polyfeatures(X, self.degree)
+
+        # standardize all features
+        X = (X-self.X_mean)/self.X_std
 
         # add 1s column
         X_ = np.c_[np.ones([n, 1]), X]
 
         print(X_)
-
         # predict
-        return X_.dot(self.weights)
-
+        return X_.dot(self.weight).reshape((-1,1))
 
 @problem.tag("hw1-A")
 def mean_squared_error(a: np.ndarray, b: np.ndarray) -> float:
@@ -117,11 +112,18 @@ def mean_squared_error(a: np.ndarray, b: np.ndarray) -> float:
     Args:
         a (np.ndarray): Array of shape (n, 1)
         b (np.ndarray): Array of shape (n, 1)
+    
+    
 
     Returns:
         float: mean squared error between a and b.
     """
-    raise NotImplementedError("Your Code Goes Here")
+
+    difference_array = np.subtract(a, b)
+    squared_array = np.square(difference_array)
+    mse = squared_array.mean()
+
+    return mse
 
 
 @problem.tag("hw1-A", start_line=5)
