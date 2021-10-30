@@ -101,7 +101,6 @@ class PolynomialRegression:
         # add 1s column
         X_ = np.c_[np.ones([n, 1]), X]
 
-        print(X_)
         # predict
         return X_.dot(self.weight).reshape((-1,1))
 

@@ -1,6 +1,7 @@
 import numpy as np
 
 from utils import load_dataset, problem
+import pdb
 
 
 @problem.tag("hw1-A")
@@ -24,7 +25,22 @@ def train(x: np.ndarray, y: np.ndarray, _lambda: float) -> np.ndarray:
         np.ndarray: weight matrix of shape `(d, k)`
             which minimizes Regularized Squared Error on `x` and `y` with hyperparameter `_lambda`.
     """
-    raise NotImplementedError("Your Code Goes Here")
+    pdb.set_trace
+    
+    n = len(x)
+
+    # add 1s column
+    x = np.c_[np.ones([n, 1]), x]
+
+    n, d = x.shape
+    d = d-1  # remove 1 for the extra column of ones we added to get the original num features
+
+    # construct reg matrix
+    reg_matrix = _lambda * np.eye(d + 1)
+    reg_matrix[0, 0] = 0
+
+    # analytical solution (X'X + regMatrix)^-1 X' y
+    return(np.linalg.pinv(x.T.dot(x) + reg_matrix).dot(x.T).dot(y))
 
 
 @problem.tag("hw1-A")
@@ -72,8 +88,18 @@ def one_hot(y: np.ndarray, num_classes: int) -> np.ndarray:
         ]
         ```
     """
-    raise NotImplementedError("Your Code Goes Here")
+    init_flag = 0
 
+    for i in y:
+        row = np.zeros(num_classes, dtype=int)
+        row[int(i)] = 1
+
+        if init_flag == 0:
+            base = row
+            init_flag = 1
+        else:
+            base = np.vstack((base, row))
+    return(base)
 
 def main():
 

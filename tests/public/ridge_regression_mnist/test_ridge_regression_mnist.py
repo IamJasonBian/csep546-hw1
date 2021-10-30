@@ -96,7 +96,6 @@ class TestRidgeRegressionMNIST(TestCase):
             x = np.linspace([-2, -2], [2, 2], num=16)
             y = np.sum(x, axis=1)
             expected = np.array([0, 0])
-
             actual = ridge_regression.train(x, y, _lambda=1e6)
             np.testing.assert_array_almost_equal(actual, expected, decimal=4)
         except:  # noqa: E722

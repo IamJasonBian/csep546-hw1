@@ -1,21 +1,20 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
+import os
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import PolynomialFeatures
 
-if __name__ == "__main__":
-    from polyreg import PolynomialRegression  # type: ignore
-else:
-    from .polyreg import PolynomialRegression
+os.chdir('C:\\Users\\Jason\\Desktop\\csep546-hw1\\homeworks\\poly_regression')
+
+from polyreg import PolynomialRegression
 
 if __name__ == "__main__":
     """
         Main function to test polynomial regression
     """
-
-
+    
+    os.chdir("C:/Users/Jason/Desktop/csep546-hw1/")
     # load the data
     filePath = "data/polyreg/polydata.dat"
     file = open(filePath, "r")
@@ -26,7 +25,7 @@ if __name__ == "__main__":
 
     # regression with degree = d
     d = 8
-    model = PolynomialRegression(degree=d, reg_lambda=0)
+    model = PolynomialRegression(degree=d, reg_lambda=4)
     model.fit(X, y)
 
     print(model.fit)
